@@ -1,7 +1,7 @@
 // Copyright AudioKit. All Rights Reserved. Revision History at http://github.com/AudioKit/Flow/
 
 import SwiftUI
-
+import OSLog
 /// Provides pan and zoom gestures. Unfortunately it seems this
 /// can't be accomplished using purely SwiftUI because MagnificationGesture
 /// doesn't provide a center point.
@@ -170,10 +170,11 @@ class PanView: NSView {
 
         // Reset translation.
         sender.setTranslation(CGPoint.zero, in: nil)
+			
     }
 
     @objc func zoomGesture(sender: NSMagnificationGestureRecognizer) {
-
+			print(sender.location(in:self).size)
         if sender.state == .changed {
             var p = sender.location(in: self).size
             p.height = frame.size.height - p.height

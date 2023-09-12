@@ -77,7 +77,7 @@ extension NodeEditor {
                 case let .node(nodeIndex):
                     dragInfo = .node(index: nodeIndex, offset: translation)
                 case let .output(nodeIndex, portIndex):
-                    dragInfo = DragInfo.wire(output: OutputID(nodeIndex, portIndex), offset: translation)
+                    dragInfo = DragInfo.wire(output: OutputID(nodeIndex, portIndex), offset: translation )
                 case let .input(nodeIndex, portIndex):
                     let node = patch.nodes[nodeIndex]
                     // Is a wire attached to the input?
