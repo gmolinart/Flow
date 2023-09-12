@@ -54,8 +54,8 @@ public extension NodeEditor {
 public extension NodeEditor.Style {
     /// Configuration used to determine rendering style of a ``NodeEditor`` wire type.
     struct WireStyle {
-        public var inputColor: Color = .cyan
-        public var outputColor: Color = .magenta
+        public var inputColor: Color = .black
+				public var outputColor: Color = .black
 
         /// Get or set the input and output colors as a `Gradient`.
         /// Only the first and last stops will be used.

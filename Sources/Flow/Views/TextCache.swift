@@ -25,7 +25,7 @@ class TextCache: ObservableObject {
             return resolved
         }
 
-        let resolved = cx.resolve(Text(string).font(font))
+			let resolved = cx.resolve(Text(string).font(font).foregroundColor(.black))
         cache[key] = resolved
         return resolved
     }
