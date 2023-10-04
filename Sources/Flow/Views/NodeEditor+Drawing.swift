@@ -77,7 +77,7 @@ extension NodeEditor {
 		portShading: GraphicsContext.Shading,
 		isConnected: Bool
 	) {
-		let rect = node.inputRect(input: index, layout: layout).offset(by: offset )
+		let rect = node.inputRect(input: index, layout: layout).offset(by: offset + CGSize(width: 20, height: 0))
 		//			rect.offsetBy(dx: 0, dy: 0)
 		
 		let circle = Path(ellipseIn: rect)
@@ -98,7 +98,7 @@ extension NodeEditor {
 		
 		cx.draw(
 			textCache.text(string: port.name, font: layout.portNameFont, cx),
-			at: rect.center + CGSize(width: layout.portSize.width / 2 + layout.portSpacing  , height: 0),
+			at: rect.center + CGSize(width: layout.portSize.width / 2 + layout.portSpacing , height: 0),
 			anchor: .leading
 		)
 	}
@@ -112,7 +112,8 @@ extension NodeEditor {
 		portShading: GraphicsContext.Shading,
 		isConnected: Bool
 	) {
-		let rect = node.outputRect(output: index, layout: layout).offset(by: offset)
+		
+		let rect = node.outputRect(output: index, layout: layout).offset(by: offset + CGSize(width: -20, height: 0))
 		let circle = Path(ellipseIn: rect)
 		let port = node.outputs[index]
 		
@@ -132,7 +133,7 @@ extension NodeEditor {
 		}
 		
 		cx.draw(textCache.text(string: port.name, font: layout.portNameFont, cx),
-						at: rect.center + CGSize(width: -(layout.portSize.width / 2 + layout.portSpacing), height: 0),
+						at: rect.center + CGSize(width: -(layout.portSize.width / 2 + layout.portSpacing ), height: 0),
 						anchor: .trailing)
 	}
 	
@@ -173,7 +174,7 @@ extension NodeEditor {
 		
 		//            cx.fill(titleBar, with: .color(node.titleBarColor))
 	}
-	func drawNodeComponents(node:Node, index : Int, cx: GraphicsContext , viewport:CGRect){
+	func drawNodeComponents(node:Node, entity:Entity, index : Int, cx: GraphicsContext , viewport:CGRect){
 		let offset = self.offset(for: index)
 		let rect = node.rect(layout: layout).offset(by: offset)
 		let rectShadow = rect.offset(by: CGSize(width: -10, height: 10))
@@ -202,7 +203,7 @@ extension NodeEditor {
 		drawComponentHeader(rect: rect)
 		
 		
-		cx.stroke(bg, with: .color(.black), style: .init(lineWidth: 5.0))
+		cx.stroke(bg, with: selected ? .color(.white): .color(.black), style: .init(lineWidth: 5.0))
 		
 		//						cx.draw(image, at:node.position)
 		
@@ -211,14 +212,12 @@ extension NodeEditor {
 			cx.stroke(bg, with: .color(.white), style: .init(lineWidth: 4.0))
 		}
 		
-		cx.draw(textCache.text(string:"🚀", font: title, cx),
-						at: pos + CGSize(width: 18, height: layout.nodeTitleHeight / 2),
-						anchor: .center)
-		cx.draw(textCache.text(string: node.name, font: title, cx),
-						at: pos + CGSize(width: rect.size.width / 2, height: layout.nodeTitleHeight / 2),
-						anchor: .center)
-		cx.draw(textCache.text(string: node.name, font: title, cx),
-						at: pos + CGSize(width: rect.size.width / 2, height: layout.nodeTitleHeight / 2),
+//		cx.draw(textCache.text(string:"🚀", font: title, cx),
+//						at: pos + CGSize(width: 18, height: layout.nodeTitleHeight / 2 * CGFloat(entity.ty)),
+//						anchor: .center)
+		
+		cx.draw(textCache.text(string: entity.name, font: title, cx),
+						at: pos + CGSize(width: rect.size.width / 2, height: layout.nodeTitleHeight / 2 * CGFloat(entity.ty) ),
 						anchor: .center)
 		
 		let in_offset : CGSize =   (offset + layout.input_offset)
@@ -256,14 +255,58 @@ extension NodeEditor {
 func drawNodes(cx: GraphicsContext, viewport: CGRect) {
 	
 	for (nodeIndex, node) in patch.nodes.enumerated() {
+		var inputs = [String: Entity]()
+		for input in node.inputs {
+			inputs[input.name] = Entity(name: input.name)
+		}
+		var outputs = [String: Entity]()
+		for output in node.outputs {
+			outputs[output.name] = Entity(name: output.name)
+		}
+
+		var entity = Entity(name : node.name, inputs:inputs, outputs:outputs)
+		
+		entity.ty = 1
+		
 		drawNodeComponents( node: node,
-								index: nodeIndex,
-								cx: cx,
+							entity:entity, 
+							index: nodeIndex,
+							cx: cx,
 								viewport:viewport)
 		
 	}
 }
 
+	func drawGrid(cx:GraphicsContext, viewport: CGRect){
+	
+		let gridSpacing: CGFloat = 40
+		let gridWidth: CGFloat = 2
+		let gridColor: Color = .black
+
+		let xStart = Int((viewport.minX - 30 * gridSpacing) / gridSpacing ) * Int(gridSpacing)
+		let xEnd = Int((viewport.maxX + gridSpacing) / gridSpacing) * Int(gridSpacing)
+
+		let yStart = Int((viewport.minY - 30 * gridSpacing) / gridSpacing) * Int(gridSpacing)
+		let yEnd = Int((viewport.maxY  + gridSpacing) / gridSpacing) * Int(gridSpacing)
+
+		for x in stride(from: xStart, through: xEnd, by: Int(gridSpacing)) {
+				let line = Path { path in
+						path.move(to: CGPoint(x: CGFloat(x), y: CGFloat(yStart)))
+						path.addLine(to: CGPoint(x: CGFloat(x), y: CGFloat(yEnd)))
+				}
+				cx.stroke(line, with: .color(gridColor), lineWidth: gridWidth)
+				
+		}
+
+		for y in stride(from: yStart, through: yEnd, by: Int(gridSpacing)) {
+				let line = Path { path in
+						path.move(to: CGPoint(x: CGFloat(xStart), y: CGFloat(y)))
+						path.addLine(to: CGPoint(x: CGFloat(xEnd), y: CGFloat(y)))
+				}
+				cx.stroke(line, with: .color(gridColor), lineWidth: gridWidth)
+		}
+	 
+	}
 func drawWires(cx: GraphicsContext, viewport: CGRect) {
 	var hideWire: Wire?
 	switch dragInfo {
@@ -299,7 +342,7 @@ func drawDraggedWire(cx: GraphicsContext) {
 			.nodes[output.nodeIndex]
 			.outputRect(output: output.portIndex, layout: self.layout)
 		let gradient = self.gradient(for: output)
-		cx.strokeWire(from: (outputRect.center + CGSize(width: 22, height: 0)), to: outputRect.center + offset, gradient: gradient)
+		cx.strokeWire(from: (outputRect.center ), to: outputRect.center + offset, gradient: gradient)
 	}
 }
 

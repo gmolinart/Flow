@@ -115,36 +115,14 @@ public struct NodeEditor: View {
 								
                 // cx.addFilter(.shadow(radius: 5))
                 
-                cx.scaleBy(x: CGFloat(zoom), y: CGFloat(zoom))
-                cx.translateBy(x: pan.width, y: pan.height)
+							//pan zoom controls
+								cx.scaleBy(x: CGFloat(zoom), y: CGFloat(zoom))
+								cx.translateBy(x: pan.width, y: pan.height)
 							
-                let gridSpacing: CGFloat = 40
-                let gridWidth: CGFloat = 2
-                let gridColor: Color = .black
-
-								let xStart = Int((viewport.minX - 30 * gridSpacing) / gridSpacing ) * Int(gridSpacing)
-                let xEnd = Int((viewport.maxX + gridSpacing) / gridSpacing) * Int(gridSpacing)
-
-                let yStart = Int((viewport.minY - 30 * gridSpacing) / gridSpacing) * Int(gridSpacing)
-                let yEnd = Int((viewport.maxY  + gridSpacing) / gridSpacing) * Int(gridSpacing)
-
-                for x in stride(from: xStart, through: xEnd, by: Int(gridSpacing)) {
-                    let line = Path { path in
-                        path.move(to: CGPoint(x: CGFloat(x), y: CGFloat(yStart)))
-                        path.addLine(to: CGPoint(x: CGFloat(x), y: CGFloat(yEnd)))
-                    }
-                    cx.stroke(line, with: .color(gridColor), lineWidth: gridWidth)
-                    
-                }
-
-                for y in stride(from: yStart, through: yEnd, by: Int(gridSpacing)) {
-                    let line = Path { path in
-                        path.move(to: CGPoint(x: CGFloat(xStart), y: CGFloat(y)))
-                        path.addLine(to: CGPoint(x: CGFloat(xEnd), y: CGFloat(y)))
-                    }
-                    cx.stroke(line, with: .color(gridColor), lineWidth: gridWidth)
-                }
-                
+							
+							
+							
+								self.drawGrid(cx: cx, viewport: viewport)
                 self.drawWires(cx: cx, viewport: viewport)
                 self.drawNodes(cx: cx, viewport: viewport)
                 self.drawDraggedWire(cx: cx)
@@ -168,24 +146,24 @@ public struct NodeEditor: View {
 
 
 
-func simplePatch() -> Patch {
-    let generator = Node(name: "generator", titleBarColor: Color.cyan, outputs: ["out"])
-    let processor = Node(name: "processor", titleBarColor: Color.red, inputs: ["in"], outputs: ["out"])
-    let mixer = Node(name: "mixer", titleBarColor: Color.gray, inputs: ["in1", "in2"], outputs: ["out"])
-    let output = Node(name: "output", titleBarColor: Color.purple, inputs: ["in"])
-
-    let nodes = [generator, processor, generator, processor, mixer, output]
-
-    let wires = Set([Wire(from: OutputID(0, 0), to: InputID(1, 0)),
-                     Wire(from: OutputID(1, 0), to: InputID(4, 0)),
-                     Wire(from: OutputID(2, 0), to: InputID(3, 0)),
-                     Wire(from: OutputID(3, 0), to: InputID(4, 1)),
-                     Wire(from: OutputID(4, 0), to: InputID(5, 0))])
-
-    var patch = Patch(nodes: nodes, wires: wires)
-    patch.recursiveLayout(nodeIndex: 5, at: CGPoint(x: 800, y: 50))
-    return patch
-}
+//func simplePatch() -> Patch {
+//    let generator = Node(name: "generator", titleBarColor: Color.cyan, outputs: ["out"])
+//    let processor = Node(name: "processor", titleBarColor: Color.red, inputs: ["in"], outputs: ["out"])
+//    let mixer = Node(name: "mixer", titleBarColor: Color.gray, inputs: ["in1", "in2"], outputs: ["out"])
+//    let output = Node(name: "output", titleBarColor: Color.purple, inputs: ["in"])
+//
+//    let nodes = [generator, processor, generator, processor, mixer, output]
+//
+//    let wires = Set([Wire(from: OutputID(0, 0), to: InputID(1, 0)),
+//                     Wire(from: OutputID(1, 0), to: InputID(4, 0)),
+//                     Wire(from: OutputID(2, 0), to: InputID(3, 0)),
+//                     Wire(from: OutputID(3, 0), to: InputID(4, 1)),
+//                     Wire(from: OutputID(4, 0), to: InputID(5, 0))])
+//
+//    var patch = Patch(nodes: nodes, wires: wires)
+//    patch.recursiveLayout(nodeIndex: 5, at: CGPoint(x: 800, y: 50))
+//    return patch
+//}
 
 /// Bit of a stress test to show how Flow performs with more nodes.
 func randomPatch() -> Patch {
@@ -206,19 +184,36 @@ func randomPatch() -> Patch {
     return Patch(nodes: randomNodes, wires: randomWires)
 }
 
+public func simplePatch() -> Patch {
+    let generator = Node(name: "generator", titleBarColor: Color.cyan, outputs: ["out"])
+    let processor = Node(name: "processor", titleBarColor: Color.red, inputs: ["in"], outputs: ["out"])
+    let mixer = Node(name: "mixer", titleBarColor: Color.gray, inputs: ["in1", "in2"], outputs: ["out"])
+    let output = Node(name: "output", titleBarColor: Color.purple, inputs: ["in"])
+
+    let nodes = [generator, processor, generator, processor, mixer, output]
+
+    let wires = Set([Wire(from: OutputID(0, 0), to: InputID(1, 0)),
+                     Wire(from: OutputID(1, 0), to: InputID(4, 0)),
+                     Wire(from: OutputID(2, 0), to: InputID(3, 0)),
+                     Wire(from: OutputID(3, 0), to: InputID(4, 1)),
+                     Wire(from: OutputID(4, 0), to: InputID(5, 0))])
+
+    var patch = Patch(nodes: nodes, wires: wires)
+    patch.recursiveLayout(nodeIndex: 5, at: CGPoint(x: 800, y: 50))
+    return patch
+}
 struct ContentView: View {
     @State var patch = simplePatch()
     @State var selection = Set<NodeIndex>()
 
-    func addNode() {
-        let newNode = Node(name: "processor", titleBarColor: Color.red, inputs: ["in"], outputs: ["out"])
-        patch.nodes.append(newNode)
-    }
 
     var body: some View {
         ZStack(alignment: .topTrailing) {
+            Rectangle().foregroundColor(
+                Color(red: 0.3, green: 0.3, blue: 0.7, opacity: 1.0)
+            ).edgesIgnoringSafeArea(.all)
             NodeEditor(patch: $patch, selection: $selection)
-            Button("Add Node", action: addNode).padding()
+//            Button("Add Node", action: addNode).padding()
         }
     }
 }

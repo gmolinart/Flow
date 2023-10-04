@@ -128,7 +128,7 @@ extension NodeEditor {
                         }
                     case let .output(nodeIndex, portIndex):
                         let type = patch.nodes[nodeIndex].outputs[portIndex].type
-                        if let input = findInput(point: location, type: type) {
+											if let input = findInput(point: location, type: type) {
                             connect(OutputID(nodeIndex, portIndex), to: input)
                         }
                     case let .input(nodeIndex, portIndex):
