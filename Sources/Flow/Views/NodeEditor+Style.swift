@@ -22,32 +22,20 @@ public extension NodeEditor {
         public var customWires: [String: WireStyle] = [:]
 
         /// Returns input or output port color for the specified port type.
-        public func color(for portType: PortType, isOutput: Bool) -> Color? {
-            switch portType {
-            case .control:
-                return isOutput ? controlWire.outputColor : controlWire.inputColor
-            case .signal:
-                return isOutput ? signalWire.outputColor : signalWire.inputColor
-            case .midi:
-                return isOutput ? midiWire.outputColor : midiWire.inputColor
-            case let .custom(id):
-                return isOutput ? customWires[id]?.outputColor : customWires[id]?.inputColor
-            }
-        }
+//        public func color(for portType: PortType, isOutput: Bool) -> Color? {
+//            switch portType {
+//            case .control:
+//                return isOutput ? controlWire.outputColor : controlWire.inputColor
+//            case .signal:
+//                return isOutput ? signalWire.outputColor : signalWire.inputColor
+//            case .midi:
+//                return isOutput ? midiWire.outputColor : midiWire.inputColor
+//            case let .custom(id):
+//                return isOutput ? customWires[id]?.outputColor : customWires[id]?.inputColor
+//            }
+//        }
 
         /// Returns port gradient for the specified port type.
-        public func gradient(for portType: PortType) -> Gradient? {
-            switch portType {
-            case .control:
-                return controlWire.gradient
-            case .signal:
-                return signalWire.gradient
-            case .midi:
-                return midiWire.gradient
-            case let .custom(id):
-                return customWires[id]?.gradient
-            }
-        }
     }
 }
 

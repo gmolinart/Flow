@@ -17,30 +17,14 @@ public extension Patch {
     ) -> (aggregateHeight: CGFloat,
           consumedNodeIndexes: Set<NodeIndex>)
     {
-        nodes[nodeIndex].position = point
+        nodes[nodeIndex].tx = Float(point.x)
+        nodes[nodeIndex].ty = Float(point.y)
+        nodes[nodeIndex].tz = 0
 
-        // XXX: super slow
-        let incomingWires = wires.filter {
-            $0.input.nodeIndex == nodeIndex
-        }.sorted(by: { $0.input.portIndex < $1.input.portIndex })
 
-        var consumedNodeIndexes = consumedNodeIndexes
+			let consumedNodeIndexes = consumedNodeIndexes
 
-        var height: CGFloat = 0
-        for wire in incomingWires {
-            let addPadding = wire == incomingWires.last
-            let ni = wire.output.nodeIndex
-            guard !consumedNodeIndexes.contains(ni) else { continue }
-            let rl = recursiveLayout(nodeIndex: ni,
-                                     at: CGPoint(x: point.x - layout.nodeWidth - layout.nodeSpacing,
-                                                 y: point.y + height),
-                                     layout: layout,
-                                     consumedNodeIndexes: consumedNodeIndexes,
-                                     nodePadding: addPadding)
-            height = rl.aggregateHeight
-            consumedNodeIndexes.insert(ni)
-            consumedNodeIndexes.formUnion(rl.consumedNodeIndexes)
-        }
+			let height: CGFloat = 0
 
         let nodeHeight = nodes[nodeIndex].rect(layout: layout).height
         let aggregateHeight = max(height, nodeHeight) + (nodePadding ? layout.nodeSpacing : 0)
@@ -64,10 +48,8 @@ public extension Patch {
 
             let xPos = origin.x + (CGFloat(column) * (layout.nodeWidth + layout.nodeSpacing))
             for nodeIndex in nodeStack {
-                nodes[nodeIndex].position = .init(
-                    x: xPos,
-                    y: origin.y + yOffset
-                )
+                nodes[nodeIndex].tx = Float(xPos)
+								nodes[nodeIndex].ty =   Float(origin.y + yOffset)
 
                 let nodeHeight = nodes[nodeIndex].rect(layout: layout).height
                 yOffset += nodeHeight

@@ -9,12 +9,16 @@ import Foundation
 /// as well as a function to update your data model when the `Patch` changes.
 /// Use SwiftUI's `onChange(of:)` to monitor changes, or use `NodeEditor.onNodeAdded`, etc.
 public struct Patch: Equatable {
-    public var nodes: [Node]
-    public var wires: Set<Wire>
+	public static func == (lhs: Patch, rhs: Patch) -> Bool {
+	true
+	}
+	
+    public var nodes: [Entity]
+//    public var wires: Set<Wire>
 
-    public init(nodes: [Node] = [] , wires: Set<Wire> = Set<Wire>()) {
+    public init(nodes: [Entity] = [] ) {
         self.nodes = nodes
-        self.wires = wires
+//        self.wires = wires
     }
     
 }

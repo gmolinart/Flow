@@ -9,7 +9,7 @@ final class NodeTests: XCTestCase {
     /// It will throw a compiler error if it cannot determine which to use.
     /// No logic testing is necessary here.
     func testNodeInitDisambiguation() throws {
-        _ = Node(name: "Name")
-        _ = Node(name: "Name", position: .zero, inputs: [], outputs: [])
+        _ = Entity(name: "Name")
+        _ = Entity(name: "Name")
     }
 }

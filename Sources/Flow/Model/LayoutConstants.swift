@@ -10,15 +10,15 @@ public struct LayoutConstants {
     public var portSize = CGSize(width: 14, height: 14)
     public var portSpacing: CGFloat = 10
 		public var portWidth = CGFloat(3)
-    public var nodeWidth: CGFloat = 200
-    public var nodeTitleHeight: CGFloat = 40
+    public var nodeWidth: CGFloat = 270
+    public var nodeTitleHeight: CGFloat = 80
     public var nodeSpacing: CGFloat = 40
 		public var nodeCornerRadius: CGFloat = 8
 	
 		public var input_offset =  CGSize(width: -20 , height: 0)
 		public var output_offset = CGSize(width: 22 , height: 0)
 	
-		public var nodeTitleFont = Font.custom("JetBrainsMonoNL-Regular", size: 18.0)
+		public var nodeTitleFont = Font.custom("JetBrainsMonoNL-Regular", size: 26.0)
     public var portNameFont = Font.custom("JetBrainsMonoNL-Regular", size: 16.0)
 
     public init() {}

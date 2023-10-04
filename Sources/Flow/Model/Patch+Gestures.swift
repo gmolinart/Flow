@@ -27,8 +27,10 @@ extension Patch {
         nodeMoved: NodeEditor.NodeMovedHandler
     ) {
         if !nodes[nodeIndex].locked {
-            nodes[nodeIndex].position += offset
-            nodeMoved(nodeIndex, nodes[nodeIndex].position)
+            nodes[nodeIndex].tx += Float(offset.width)
+					nodes[nodeIndex].ty += Float(offset.height)
+            let newPosition = CGPoint(x: Double(nodes[nodeIndex].tx), y: Double(nodes[nodeIndex].ty))
+            nodeMoved(nodeIndex, newPosition)
         }
     }
 

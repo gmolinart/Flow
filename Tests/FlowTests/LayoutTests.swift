@@ -5,7 +5,7 @@ import XCTest
 
 final class LayoutTests: XCTestCase {
     func testNodeRects() throws {
-        let processor = Node(name: "processor",
+        let processor = Entity(name: "processor",
                              position: CGPoint(x: 400, y: 100),
                              inputs: [Port(name: "in", type: .signal)],
                              outputs: [Port(name: "out", type: .signal)])

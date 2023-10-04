@@ -2,10 +2,10 @@ import Flow
 import SwiftUI
 
 func simplePatch() -> Patch {
-    let generator = Node(name: "generator", titleBarColor: Color.cyan, outputs: ["out"])
-    let processor = Node(name: "processor", titleBarColor: Color.red, inputs: ["in"], outputs: ["out"])
-    let mixer = Node(name: "mixer", titleBarColor: Color.gray, inputs: ["in1", "in2"], outputs: ["out"])
-    let output = Node(name: "output", titleBarColor: Color.purple, inputs: ["in"])
+    let generator = Node(name: "generator", color: "cyan", outputs: ["out"])
+    let processor = Node(name: "processor", color: "red", inputs: ["in"], outputs: ["out"])
+    let mixer = Node(name: "mixer", color: "gray", inputs: ["in1", "in2"], outputs: ["out"])
+    let output = Node(name: "output", color: "purple", inputs: ["in"])
 
     let nodes = [generator, processor, generator, processor, mixer, output]
 
@@ -26,10 +26,9 @@ func randomPatch() -> Patch {
     for n in 0 ..< 50 {
         let randomPoint = CGPoint(x: 1000 * Double.random(in: 0 ... 1),
                                   y: 1000 * Double.random(in: 0 ... 1))
-        randomNodes.append(Node(name: "node\(n)",
-                                position: randomPoint,
-                                inputs: ["In"],
-                                outputs: ["Out"]))
+        randomNodes.append(Entity(name: "node\(n)",
+																	position: [randomPoint.x, randomPoint.y])
+                                
     }
 
     var randomWires: Set<Wire> = []
@@ -44,7 +43,7 @@ struct ContentView: View {
     @State var selection = Set<NodeIndex>()
 
     func addNode() {
-        let newNode = Node(name: "processor", titleBarColor: Color.red, inputs: ["in"], outputs: ["out"])
+        let newNode = Node(name: "processor")
         patch.nodes.append(newNode)
     }
 
