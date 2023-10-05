@@ -51,7 +51,7 @@ public struct NodeEditor: View {
 
 	
 
-    /// Node moved handler closure.
+    /// Entity moved handler closure.
     public typealias NodeMovedHandler = (_ index: NodeIndex,
                                          _ location: CGPoint) -> Void
 
@@ -125,6 +125,7 @@ public struct NodeEditor: View {
 								self.drawGrid(cx: cx, viewport: viewport)
                 self.drawWires(cx: cx, viewport: viewport)
                 self.drawNodes(cx: cx, viewport: viewport)
+                self.drawRename(cx: cx, viewport: viewport)
                 self.drawDraggedWire(cx: cx)
                 self.drawSelectionRect(cx: cx)
             }
@@ -171,7 +172,7 @@ func randomPatch() -> Patch {
     for n in 0 ..< 50 {
         let randomPoint = CGPoint(x: 1000 * Double.random(in: 0 ... 1),
                                   y: 1000 * Double.random(in: 0 ... 1))
-        randomNodes.append(Node(name: "node\(n)",
+								randomNodes.append(Node(name: "node\(n)",
                                 position: randomPoint,
                                 inputs: ["In"],
                                 outputs: ["Out"]))

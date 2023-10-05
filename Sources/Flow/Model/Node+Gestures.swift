@@ -3,8 +3,8 @@
 import CoreGraphics
 import Foundation
 
-extension Node {
-    public func translate(by offset: CGSize) -> Node {
+extension Node{
+    public func translate(by offset: CGSize) -> Node{
         var result = self
         result.position.x += offset.width
         result.position.y += offset.height

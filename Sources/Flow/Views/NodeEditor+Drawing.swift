@@ -95,12 +95,13 @@ extension NodeEditor {
 		} else if rect.contains(toLocal(mousePosition)) {
 			cx.stroke(circle, with: .color(.white), style: .init(lineWidth: 2.0))
 		}
-		
-		cx.draw(
-			textCache.text(string: port.name, font: layout.portNameFont, cx),
-			at: rect.center + CGSize(width: layout.portSize.width / 2 + layout.portSpacing , height: 0),
-			anchor: .leading
-		)
+
+		// in connection
+//		cx.draw(
+//			textCache.text(string: port.name, font: layout.portNameFont, cx),
+//			at: rect.center + CGSize(width: layout.portSize.width / 2 + layout.portSpacing , height: 0),
+//			anchor: .leading
+//		)
 	}
 	
 	func drawOutputPort(
@@ -132,9 +133,9 @@ extension NodeEditor {
 			cx.stroke(circle, with: .color(.white), style: .init(lineWidth: 1.0))
 		}
 		
-		cx.draw(textCache.text(string: port.name, font: layout.portNameFont, cx),
-						at: rect.center + CGSize(width: -(layout.portSize.width / 2 + layout.portSpacing ), height: 0),
-						anchor: .trailing)
+//		cx.draw(textCache.text(string: port.name, font: layout.portNameFont, cx),
+//						at: rect.center + CGSize(width: -(layout.portSize.width / 2 + layout.portSpacing ), height: 0),
+//						anchor: .trailing)
 	}
 	
 	func inputShading(_ type: PortType,  _ colors: inout [PortType: GraphicsContext.Shading], _ cx: GraphicsContext) -> GraphicsContext.Shading {
@@ -176,7 +177,10 @@ extension NodeEditor {
 	}
 	func drawNodeComponents(node:Node, entity:Entity, index : Int, cx: GraphicsContext , viewport:CGRect){
 		let offset = self.offset(for: index)
-		let rect = node.rect(layout: layout).offset(by: offset)
+//		let rect = node.rect(layout: layout).offset(by: offset)
+		
+		let rect = CGRect(x: node.rect(layout: layout).origin.x + offset.width, y: node.rect(layout: layout).origin.y + offset.height, width: 180, height: 60)
+		
 		let rectShadow = rect.offset(by: CGSize(width: -10, height: 10))
 		let cornerRadius : CGFloat  = layout.nodeCornerRadius
 		let title = layout.nodeTitleFont
@@ -203,7 +207,7 @@ extension NodeEditor {
 		drawComponentHeader(rect: rect)
 		
 		
-		cx.stroke(bg, with: selected ? .color(.white): .color(.black), style: .init(lineWidth: 5.0))
+		cx.stroke(bg, with: selected ? .color(.white): .color(.black), style: .init(lineWidth: 3.0))
 		
 		//						cx.draw(image, at:node.position)
 		
@@ -212,10 +216,7 @@ extension NodeEditor {
 			cx.stroke(bg, with: .color(.white), style: .init(lineWidth: 4.0))
 		}
 		
-//		cx.draw(textCache.text(string:"🚀", font: title, cx),
-//						at: pos + CGSize(width: 18, height: layout.nodeTitleHeight / 2 * CGFloat(entity.ty)),
-//						anchor: .center)
-		
+		// NODE NAME
 		cx.draw(textCache.text(string: entity.name, font: title, cx),
 						at: pos + CGSize(width: rect.size.width / 2, height: layout.nodeTitleHeight / 2 * CGFloat(entity.ty) ),
 						anchor: .center)
@@ -252,7 +253,87 @@ extension NodeEditor {
 			)
 		}
 	}
-func drawNodes(cx: GraphicsContext, viewport: CGRect) {
+
+	func drawRenameComponents(node:Node, entity:Entity, index : Int, cx: GraphicsContext , viewport:CGRect){
+		let offset = self.offset(for: index)
+//		let rect = node.rect(layout: layout).offset(by: offset)
+		
+		let rect = CGRect(x: node.rect(layout: layout).origin.x + 240 + offset.width, y: node.rect(layout: layout).origin.y + offset.height, width: 280, height: 420)
+		
+		let rectShadow = rect.offset(by: CGSize(width: -10, height: 10))
+		let cornerRadius : CGFloat  = layout.nodeCornerRadius
+		let title = layout.nodeTitleFont
+		guard rect.intersects(viewport) else { return  }
+		
+		let pos = rect.origin
+		let bg = Path(roundedRect: rect, cornerRadius: cornerRadius)
+		let shadow  = Path(roundedRect: rectShadow, cornerRadius: cornerRadius)
+		let nodeColor = NodeColor(cx:cx)
+		
+		
+		var selected = false
+		switch dragInfo {
+		case let .selection(rect: selectionRect):
+			selected = rect.intersects(selectionRect)
+		default:
+			selected = selection.contains(index)
+		}
+		
+		
+		cx.fill(shadow, with : nodeColor.line)
+		cx.fill(bg, with: selected ? nodeColor.selectedShading : nodeColor.unselectedShading)
+		
+		drawComponentHeader(rect: rect)
+		
+		
+		cx.stroke(bg, with: selected ? .color(.white): .color(.black), style: .init(lineWidth: 3.0))
+		
+		//						cx.draw(image, at:node.position)
+		
+		
+		if rect.contains(toLocal(mousePosition)) {
+			cx.stroke(bg, with: .color(.white), style: .init(lineWidth: 4.0))
+		}
+		
+		// NODE NAME
+		cx.draw(textCache.text(string: entity.name, font: title, cx),
+						at: pos + CGSize(width: rect.size.width / 2, height: layout.nodeTitleHeight / 2 * CGFloat(entity.ty) ),
+						anchor: .center)
+		
+		let in_offset : CGSize =   (offset + layout.input_offset)
+		let out_offset :CGSize =  (offset + layout.output_offset)
+		
+		var input_color = [PortType: GraphicsContext.Shading]()
+		var output_color = [PortType: GraphicsContext.Shading]()
+		
+		let connectedInputs = Set( patch.wires.map { wire in wire.input } )
+		let connectedOutputs = Set( patch.wires.map { wire in wire.output} )
+		
+		for (i, input) in node.inputs.enumerated() {
+			drawInputPort(
+				cx: cx,
+				node: node,
+				index: i,
+				offset: in_offset,
+				width: layout.portWidth,
+				portShading: inputShading(input.type, &input_color, cx),
+				isConnected: connectedInputs.contains(InputID(index, i))
+			)
+		}
+		for (i, output) in node.outputs.enumerated() {
+			drawOutputPort(
+				cx: cx,
+				node: node,
+				index: i,
+				offset: out_offset,
+				width: layout.portWidth,
+				portShading: outputShading(output.type, &output_color, cx),
+				isConnected: connectedOutputs.contains(OutputID(index, i))
+			)
+		}
+	}
+
+	func drawNodes(cx: GraphicsContext, viewport: CGRect) {
 	
 	for (nodeIndex, node) in patch.nodes.enumerated() {
 		var inputs = [String: Entity]()
@@ -276,7 +357,31 @@ func drawNodes(cx: GraphicsContext, viewport: CGRect) {
 		
 	}
 }
+	func drawRename(cx: GraphicsContext, viewport: CGRect) {
+		
+		if let node = patch.nodes.first {
+			let nodeIndex = 0
+			var inputs = [String: Entity]()
+			for input in node.inputs {
+				inputs[input.name] = Entity(name: input.name)
+			}
+			var outputs = [String: Entity]()
+			for output in node.outputs {
+				outputs[output.name] = Entity(name: output.name)
+			}
 
+			var entity = Entity(name : node.name, inputs:inputs, outputs:outputs)
+			
+			entity.ty = 1
+			
+			drawRenameComponents( node: node,
+								entity:entity,
+								index: nodeIndex,
+								cx: cx,
+									viewport:viewport)
+			
+		}
+	}
 	func drawGrid(cx:GraphicsContext, viewport: CGRect){
 	
 		let gridSpacing: CGFloat = 40

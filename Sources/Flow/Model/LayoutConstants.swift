@@ -9,9 +9,9 @@ import SwiftUI
 public struct LayoutConstants {
     public var portSize = CGSize(width: 14, height: 14)
     public var portSpacing: CGFloat = 10
-		public var portWidth = CGFloat(3)
+		public var portWidth = CGFloat(2)
     public var nodeWidth: CGFloat = 200
-    public var nodeTitleHeight: CGFloat = 80
+    public var nodeTitleHeight: CGFloat = 60
     public var nodeSpacing: CGFloat = 40
 		public var nodeCornerRadius: CGFloat = 8
 	
